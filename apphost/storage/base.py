@@ -1,19 +1,12 @@
+
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
 
 class StorageAdapter(ABC):
     @abstractmethod
-    def list_apps(self) -> List[Dict[str, Any]]:
-        raise NotImplementedError
-
+    def list_apps(self): ...
     @abstractmethod
-    def get_app(self, slug: str) -> Optional[Dict[str, Any]]:
-        raise NotImplementedError
-
+    def get_app(self, slug): ...
     @abstractmethod
-    def save_app(self, app_data: Dict[str, Any]) -> None:
-        raise NotImplementedError
-
+    def save_app(self, data): ...
     @abstractmethod
-    def delete_app(self, slug: str) -> None:
-        raise NotImplementedError
+    def delete_app(self, slug): ...

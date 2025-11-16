@@ -1,44 +1,5 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>AppHost Admin</title>
-  <link rel="stylesheet" href="/static/admin.css">
-</head>
-<body>
-  <h1>AppHost Admin</h1>
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <ul class="flashes">
-        {% for category, message in messages %}
-          <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
 
-  <p><a href="{{ url_for('new_app') }}">➕ Create New App</a></p>
-
-  {% if apps %}
-    <table>
-      <tr><th>Slug</th><th>Name</th><th>Description</th><th>Actions</th></tr>
-      {% for a in apps %}
-        <tr>
-          <td><code>{{ a.slug }}</code></td>
-          <td>{{ a.name }}</td>
-          <td>{{ a.description }}</td>
-          <td>
-            <a href="{{ url_for('edit_app', slug=a.slug) }}">Edit</a> |
-            <form method="post" action="{{ url_for('delete_app_route', slug=a.slug) }}" style="display:inline;" onsubmit="return confirm('Delete app {{ a.slug }}?');">
-              <button type="submit">Delete</button>
-            </form> |
-            <a href="/apps/{{ a.slug }}/" target="_blank">Open</a>
-          </td>
-        </tr>
-      {% endfor %}
-    </table>
-  {% else %}
-    <p>No apps defined yet.</p>
-  {% endif %}
-</body>
-</html>
+<h1>Admin</h1>
+{% for a in apps %}
+ <div>{{a.slug}} - {{a.name}}</div>
+{% endfor %}

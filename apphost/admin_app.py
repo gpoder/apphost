@@ -1,52 +1,52 @@
+
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from .models.app_registry import list_apps, create_or_update_app, delete_app, get_app
 
+BASE=os.path.dirname(__file__)
+TEMPL=os.path.join(BASE,"templates")
+STAT=os.path.join(BASE,"static")
+
 def create_admin_app():
-    app = Flask("admin_app", template_folder="templates", static_folder="static")
-    app.secret_key = "change-me-in-production"
+    app=Flask("admin_app",template_folder=TEMPL,static_folder=STAT)
+    app.secret_key="apphost-secret"
 
     @app.route("/")
     def index():
-        apps = list_apps()
-        return render_template("admin/index.html", apps=apps)
+        return render_template("admin/index.html", apps=list_apps())
 
-    @app.route("/apps/new", methods=["GET", "POST"])
-    def new_app():
-        if request.method == "POST":
-            slug = request.form.get("slug", "").strip()
-            name = request.form.get("name", "").strip()
-            description = request.form.get("description", "").strip()
+    @app.route("/apps/new",methods=["GET","POST"])
+    def new():
+        if request.method=="POST":
+            slug=request.form.get("slug","")
+            name=request.form.get("name","")
+            desc=request.form.get("description","")
             if not slug or not name:
-                flash("Slug and Name are required.", "error")
+                flash("Slug + Name required","error")
             else:
-                create_or_update_app(slug, name, description)
-                flash(f"App '{slug}' saved.", "success")
+                create_or_update_app(slug,name,desc)
+                flash("Created","success")
                 return redirect(url_for("index"))
         return render_template("admin/new_app.html")
 
-    @app.route("/apps/<slug>/edit", methods=["GET", "POST"])
-    def edit_app(slug):
-        app_data = get_app(slug)
-        if not app_data:
-            flash(f"App '{slug}' not found.", "error")
+    @app.route("/apps/<slug>/edit",methods=["GET","POST"])
+    def edit(slug):
+        item=get_app(slug)
+        if not item:
+            flash("Not found","error")
             return redirect(url_for("index"))
+        if request.method=="POST":
+            name=request.form.get("name","")
+            desc=request.form.get("description","")
+            create_or_update_app(slug,name,desc)
+            flash("Updated","success")
+            return redirect(url_for("index"))
+        return render_template("admin/edit_app.html", app_data=item)
 
-        if request.method == "POST":
-            name = request.form.get("name", "").strip()
-            description = request.form.get("description", "").strip()
-            if not name:
-                flash("Name is required.", "error")
-            else:
-                create_or_update_app(slug, name, description)
-                flash(f"App '{slug}' updated.", "success")
-                return redirect(url_for("index"))
-
-        return render_template("admin/edit_app.html", app_data=app_data)
-
-    @app.route("/apps/<slug>/delete", methods=["POST"])
-    def delete_app_route(slug):
+    @app.route("/apps/<slug>/delete",methods=["POST"])
+    def delete(slug):
         delete_app(slug)
-        flash(f"App '{slug}' deleted.", "success")
+        flash("Deleted","success")
         return redirect(url_for("index"))
 
     return app
