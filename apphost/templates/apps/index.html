@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Apps</title>
+  <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+  <h1>Available Apps</h1>
+  {% if apps %}
+    <ul>
+      {% for a in apps %}
+        <li><a href="/apps/{{ a.slug }}/">{{ a.name }} ({{ a.slug }})</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No apps defined.</p>
+  {% endif %}
+  <p><a href="/admin/">Admin</a></p>
+</body>
+</html>
