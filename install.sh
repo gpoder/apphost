@@ -4,7 +4,7 @@ set -o pipefail
 
 echo "==============================================="
 echo "  AppHost Zero-Config Installer"
-echo "  Target: Ubuntu 24.04"
+echo "  Ubuntu 24.04 + NGINX (disable default server)"
 echo "==============================================="
 
 if [[ "$EUID" -ne 0 ]]; then
@@ -28,7 +28,7 @@ mkdir -p "$DISPATCHER_DIR"
 mkdir -p "$APP_DIR"
 mkdir -p "$DATA_DIR"
 
-echo "📦 Copying code into $APP_DIR ..."
+echo "📦 Syncing code into $APP_DIR ..."
 rsync -a --delete --exclude 'venv' ./ "$APP_DIR/"
 
 chown -R www-data:www-data "$DISPATCHER_DIR"
@@ -68,16 +68,29 @@ systemctl daemon-reload
 systemctl enable apphost
 systemctl restart apphost || true
 
-echo "🌐 Configuring NGINX at $NGINX_CONF ..."
+echo "🛑 Disabling default NGINX server..."
+DEFAULT_AVAIL="/etc/nginx/sites-available/default"
+DEFAULT_ENABLED="/etc/nginx/sites-enabled/default"
+
+if [[ -f "$DEFAULT_ENABLED" ]]; then
+    rm -f "$DEFAULT_ENABLED"
+    echo "✔ Removed symlink: $DEFAULT_ENABLED"
+fi
+
+if [[ -f "$DEFAULT_AVAIL" ]]; then
+    mv "$DEFAULT_AVAIL" "$DEFAULT_AVAIL.disabled" 2>/dev/null || true
+    echo "✔ Disabled default server definition"
+fi
+
+echo "🌐 Installing AppHost NGINX configuration…"
 if [[ -f "$NGINX_CONF" ]]; then
     cp "$NGINX_CONF" "$NGINX_CONF.bak-$(date +%s)"
 fi
 
 cat > "$NGINX_CONF" <<EOF
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-
+    listen 80;
+    listen [::]:80;
     server_name _;
 
     access_log /var/log/nginx/apphost_access.log;
@@ -122,7 +135,7 @@ server {
 }
 EOF
 
-echo "🔍 Testing NGINX configuration..."
+echo "🔍 Testing NGINX config..."
 nginx -t
 
 echo "🔄 Restarting NGINX..."
