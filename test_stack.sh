@@ -27,6 +27,12 @@ echo "Output: $OUT"
     echo
 
     echo "==================================================="
+    echo "== DOCKER CONTAINERS (apphost_*)"
+    echo "==================================================="
+    docker ps -a --filter "name=apphost_" || true
+    echo
+
+    echo "==================================================="
     echo "== CURL ENDPOINT TESTS"
     echo "==================================================="
     BASE="http://127.0.0.1"

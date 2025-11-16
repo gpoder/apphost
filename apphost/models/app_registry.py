@@ -12,10 +12,21 @@ def list_apps() -> List[Dict[str, Any]]:
 def get_app(slug: str) -> Optional[Dict[str, Any]]:
     return get_storage().get_app(slug)
 
-def create_or_update_app(slug: str, name: str, description: str = "") -> Dict[str, Any]:
-    data = {"slug": slug, "name": name, "description": description}
-    get_storage().save_app(data)
-    return data
+def save_app(app_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Create or update an app definition.
+
+    app_data is expected to contain at least:
+      - slug
+      - name
+      - description
+      - type: 'native' or 'container'
+      - container: {...} (for container apps)
+    """
+    if "slug" not in app_data or "name" not in app_data:
+        raise ValueError("slug and name are required")
+    storage = get_storage()
+    storage.save_app(app_data)
+    return app_data
 
 def delete_app(slug: str) -> None:
     get_storage().delete_app(slug)

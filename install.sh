@@ -3,8 +3,8 @@ set -e
 set -o pipefail
 
 echo "==============================================="
-echo "  AppHost Zero-Config Installer"
-echo "  Ubuntu 24.04 + NGINX (no default server)"
+echo "  AppHost Installer (with container support)"
+echo "  Ubuntu 24.04"
 echo "==============================================="
 
 if [[ "$EUID" -ne 0 ]]; then
@@ -21,7 +21,7 @@ DATA_DIR="/opt/apphost/data"
 
 echo "🔧 Installing OS packages..."
 apt update -y
-apt install -y python3 python3-venv python3-pip nginx rsync
+apt install -y python3 python3-venv python3-pip nginx rsync docker.io
 
 echo "📁 Creating directories..."
 mkdir -p "$DISPATCHER_DIR" "$APP_DIR" "$DATA_DIR"
@@ -46,7 +46,8 @@ echo "📝 Writing systemd service to $SYSTEMD_FILE ..."
 cat > "$SYSTEMD_FILE" <<EOF
 [Unit]
 Description=AppHost Dispatcher (Gunicorn)
-After=network.target
+After=network.target docker.service
+Requires=docker.service
 
 [Service]
 User=www-data
@@ -105,7 +106,7 @@ server {
         empty_gif;
     }
 
-    # Static assets (shared between admin/apps UIs)
+    # Static assets
     location /static/ {
         alias $APP_DIR/apphost/static/;
     }
@@ -119,7 +120,7 @@ server {
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
 
-    # Apps UI
+    # Apps UI (native + container proxied via Python)
     location /apps/ {
         proxy_pass http://unix:$DISPATCHER_DIR/apphost.sock:/apps/;
         proxy_set_header Host \$host;

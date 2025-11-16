@@ -7,14 +7,46 @@
 </head>
 <body>
   <h1>Edit App {{ app_data.slug }}</h1>
+
   <form method="post">
-    <p><strong>Slug:</strong> <code>{{ app_data.slug }}</code></p>
-    <label>Name <input type="text" name="name" value="{{ app_data.name }}" required></label><br>
-    <label>Description<br>
-      <textarea name="description" rows="4" cols="40">{{ app_data.description }}</textarea>
-    </label><br>
+    <fieldset>
+      <legend>Basic</legend>
+      <p><strong>Slug:</strong> <code>{{ app_data.slug }}</code></p>
+      <label>Name <input type="text" name="name" value="{{ app_data.name }}" required></label><br>
+      <label>Description<br>
+        <textarea name="description" rows="3" cols="50">{{ app_data.description }}</textarea>
+      </label><br>
+      <label>Type
+        <select name="app_type">
+          <option value="native" {{ 'selected' if app_data.type != 'container' }}>Native</option>
+          <option value="container" {{ 'selected' if app_data.type == 'container' }}>Container</option>
+        </select>
+      </label>
+    </fieldset>
+
+    {% set c = app_data.container or {} %}
+
+    <fieldset>
+      <legend>Container Settings</legend>
+      <label>Mode
+        <select name="container_mode">
+          <option value="pull" {{ 'selected' if c.mode == 'pull' }}>Pull image</option>
+          <option value="build" {{ 'selected' if c.mode == 'build' }}>Build from Dockerfile</option>
+        </select>
+      </label><br>
+      <label>Image <input type="text" name="container_image" value="{{ c.image or '' }}"></label><br>
+      <label>Internal port <input type="number" name="container_internal_port" value="{{ c.internal_port or 8000 }}"></label><br>
+      <label>Host port <input type="number" name="container_host_port" value="{{ c.host_port or 41000 }}"></label><br>
+      <label>Build context <input type="text" name="container_build_context" value="{{ c.build_context or 'apps' }}"></label><br>
+      <label>Data dir on host <input type="text" name="container_data_dir" value="{{ c.data_dir or '' }}"></label><br>
+      <label>Env (KEY=VAL, one per line)<br>
+        <textarea name="container_env" rows="4" cols="50">{{ c.env or '' }}</textarea>
+      </label>
+    </fieldset>
+
     <button type="submit">Save</button>
   </form>
-  <p><a href="{{ url_for('index') }}">Back</a></p>
+
+    <p><a href="{{ url_for('index') }}">Back</a></p>
 </body>
 </html>

@@ -9,9 +9,12 @@
   <h1>Available Apps</h1>
   {% if apps %}
     <ul>
-    {% for a in apps %}
-      <li><a href="/apps/{{ a.slug }}/">{{ a.name }} ({{ a.slug }})</a></li>
-    {% endfor %}
+      {% for a in apps %}
+        <li>
+          <a href="/apps/{{ a.slug }}/">{{ a.name }} ({{ a.slug }})</a>
+          — {{ a.type or 'native' }}
+        </li>
+      {% endfor %}
     </ul>
   {% else %}
     <p>No apps defined.</p>

@@ -7,14 +7,44 @@
 </head>
 <body>
   <h1>Create New App</h1>
+
   <form method="post">
-    <label>Slug <input type="text" name="slug" required></label><br>
-    <label>Name <input type="text" name="name" required></label><br>
-    <label>Description<br>
-      <textarea name="description" rows="4" cols="40"></textarea>
-    </label><br>
+    <fieldset>
+      <legend>Basic</legend>
+      <label>Slug <input type="text" name="slug" required></label><br>
+      <label>Name <input type="text" name="name" required></label><br>
+      <label>Description<br>
+        <textarea name="description" rows="3" cols="50"></textarea>
+      </label><br>
+      <label>Type
+        <select name="app_type">
+          <option value="native">Native</option>
+          <option value="container">Container</option>
+        </select>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Container Settings (optional)</legend>
+      <label>Mode
+        <select name="container_mode">
+          <option value="pull">Pull image</option>
+          <option value="build">Build from Dockerfile</option>
+        </select>
+      </label><br>
+      <label>Image <input type="text" name="container_image" placeholder="ghcr.io/user/image:tag or apphost_slug"></label><br>
+      <label>Internal port <input type="number" name="container_internal_port" value="8000"></label><br>
+      <label>Host port <input type="number" name="container_host_port" value="41000"></label><br>
+      <label>Build context (for mode=build) <input type="text" name="container_build_context" value="apps"></label><br>
+      <label>Data dir on host <input type="text" name="container_data_dir" placeholder="/opt/apphost/apps/&lt;slug&gt;/data"></label><br>
+      <label>Env (KEY=VAL, one per line)<br>
+        <textarea name="container_env" rows="4" cols="50"></textarea>
+      </label>
+    </fieldset>
+
     <button type="submit">Save</button>
   </form>
+
   <p><a href="{{ url_for('index') }}">Back</a></p>
 </body>
 </html>

@@ -22,11 +22,14 @@
 
   {% if apps %}
     <table>
-      <tr><th>Slug</th><th>Name</th><th>Description</th><th>Actions</th></tr>
+      <tr>
+        <th>Slug</th><th>Name</th><th>Type</th><th>Description</th><th>Actions</th>
+      </tr>
       {% for a in apps %}
         <tr>
           <td><code>{{ a.slug }}</code></td>
           <td>{{ a.name }}</td>
+          <td>{{ a.type or 'native' }}</td>
           <td>{{ a.description }}</td>
           <td>
             <a href="{{ url_for('edit_app', slug=a.slug) }}">Edit</a> |

@@ -38,9 +38,14 @@ class FlatFileStorage(StorageAdapter):
 
     def save_app(self, app_data: Dict[str, Any]) -> None:
         data = self._read()
-        apps = [a for a in data.get("apps", []) if a.get("slug") != app_data.get("slug")]
-        apps.append(app_data)
-        data["apps"] = sorted(apps, key=lambda x: x.get("slug", ""))
+        apps = [a for a in data.get("apps", []) if a.get("slug") == app_data.get("slug")]
+        # replace existing or append if new
+        if apps:
+            data["apps"] = [app_data if a.get("slug") == app_data.get("slug") else a for a in data.get("apps", [])]
+        else:
+            data.setdefault("apps", []).append(app_data)
+        # sort for stability
+        data["apps"] = sorted(data["apps"], key=lambda x: x.get("slug", ""))
         self._write(data)
 
     def delete_app(self, slug: str) -> None:
